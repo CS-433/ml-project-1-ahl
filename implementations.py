@@ -21,11 +21,12 @@ def compute_gradient(y, tx, w):
     """
     err = y - tx @ w
     grad = -(tx.T @ err) / len(err)
-    return grad, err
+    return grad
 
 
-def calculate_mse(e):
+def calculate_mse(y, tx, w):
     """Calculate the mse for vector e."""
+    e = y - tx @ w
     return (1 / 2) * np.mean(e**2)
 
 
@@ -94,14 +95,14 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         loss: the loss, a scalar
     """
     w = initial_w
-    grad, err = compute_gradient(y, tx, w)
-    loss = calculate_mse(err)
+    grad = compute_gradient(y, tx, w)
+    loss = calculate_mse(y, tx, w)
 
     for n_iter in range(max_iters):
         # compute gradient
-        grad, err = compute_gradient(y, tx, w)
+        grad = compute_gradient(y, tx, w)
         # compute loss and append it to array
-        loss = calculate_mse(err)
+        loss = calculate_mse(y, tx, w)
         # update w by gradient descent
         w = w - (gamma * grad)
 
@@ -132,12 +133,13 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         random_tx = np.array([tx[indice]])
 
         # compute gradient
-        grad, err = compute_gradient(random_y, random_tx, w)
+        grad = compute_gradient(random_y, random_tx, w)
+        
+        #compute loss
+        loss = calculate_mse(y, tx, w)
 
         # update w by stochastic gradient descent
         w = w - (gamma * grad)
-
-    loss = calculate_mse(err)
 
     return w, loss
 
@@ -155,9 +157,7 @@ def least_squares(y, tx):
         loss: scalar.
     """
     w = np.linalg.solve(tx.T @ tx, tx.T @ y)
-
-    err = y - tx.dot(w)
-    loss = calculate_mse(err)
+    loss = calculate_mse(y, tx, w)
 
     return w, loss
 
@@ -186,7 +186,7 @@ def ridge_regression(y, tx, lambda_):
     loss_x = tx.T @ tx
     loss_w = np.linalg.solve(loss_x, tx.T @ y)
     err = y - tx @ loss_w
-    loss = 1 / 2 * np.mean(err**2)
+    loss = calculate_mse(y, tx, loss_w)
 
     # loss = np.sqrt(2 * compute_mse(y, tx, w))
 
