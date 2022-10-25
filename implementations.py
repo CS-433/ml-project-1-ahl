@@ -244,6 +244,6 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         gradient = calculate_gradient(y, tx, w) + 2 * lambda_ * w
         w = w - gamma * gradient
 
-    loss = calculate_loss(y, tx, w) + lambda_ * np.sum(w**2)
+    loss = calculate_loss(y, tx, w)
 
     return w, loss
