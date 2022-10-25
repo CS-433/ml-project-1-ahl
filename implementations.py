@@ -95,9 +95,6 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         loss: the loss, a scalar
     """
     w = initial_w
-    grad = compute_gradient(y, tx, w)
-    loss = calculate_mse(y, tx, w)
-
     for n_iter in range(max_iters):
         # compute gradient
         grad = compute_gradient(y, tx, w)
@@ -134,8 +131,8 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
 
         # compute gradient
         grad = compute_gradient(random_y, random_tx, w)
-
-        # compute loss
+        
+        #compute loss
         loss = calculate_mse(y, tx, w)
 
         # update w by stochastic gradient descent
