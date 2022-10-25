@@ -100,8 +100,6 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     for n_iter in range(max_iters):
         # compute gradient
         grad = compute_gradient(y, tx, w)
-        # compute loss and append it to array
-        loss = calculate_mse(y, tx, w)
         # update w by gradient descent
         w = w - (gamma * grad)
         print(
@@ -109,6 +107,8 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
                 bi=n_iter, ti=max_iters - 1, l=loss
             )
         )
+        # compute loss and append it to array
+        loss = calculate_mse(y, tx, w)
 
     return w, loss
 
