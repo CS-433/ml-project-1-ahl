@@ -26,7 +26,7 @@ def compute_gradient(y, tx, w):
 
 def calculate_mse(e):
     """Calculate the mse for vector e."""
-    return 1 / 2 * np.mean(e**2)
+    return (1 / 2) * np.mean(e**2)
 
 
 def sigmoid(t):
