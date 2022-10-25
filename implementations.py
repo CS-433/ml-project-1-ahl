@@ -189,7 +189,6 @@ def ridge_regression(y, tx, lambda_):
     # loss should not include the penalty term
     loss_x = tx.T @ tx
     loss_w = np.linalg.solve(loss_x, tx.T @ y)
-    err = y - tx @ loss_w
     loss = calculate_mse(y, tx, loss_w)
 
     # loss = np.sqrt(2 * compute_mse(y, tx, w))
