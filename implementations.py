@@ -129,6 +129,7 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
     """
     w = initial_w
     data_size = len(y)
+    loss = calculate_mse(y, tx, w)
 
     for n_iter in range(max_iters):
         indice = np.random.choice(np.arange(data_size))
@@ -186,12 +187,9 @@ def ridge_regression(y, tx, lambda_):
 
     w = np.linalg.solve(X, tx.T @ y)
 
-    # loss should not include the penalty term
     loss_x = tx.T @ tx
     loss_w = np.linalg.solve(loss_x, tx.T @ y)
     loss = calculate_mse(y, tx, w)
-
-    # loss = np.sqrt(2 * compute_mse(y, tx, w))
 
     return w, loss
 
