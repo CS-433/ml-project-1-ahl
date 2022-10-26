@@ -219,15 +219,28 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         w: optimal weights, numpy array of shape(D,), D is the number of features.
         loss: scalar.
     """
+    threshold = 1e-8
     w = initial_w
+    loss = calculate_loss(y, tx, w)
+    losses = [loss]
 
     for iter in range(max_iters):
         grad = calculate_gradient(y, tx, w)
+        
         w = w - gamma * grad
+        
+        loss = calculate_loss(y, tx, w)
+        
+        if iter % 1 == 0:
+            print("Current iteration={i}, the loss={l}, the grad={we}".format(i=iter, l=loss, we=np.mean(grad)))
+            
+        losses.append(loss)
+        
+        # converge criterion
+        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            break
 
-    loss = calculate_loss(y, tx, w)
-
-    return w, loss
+    return w, loss[-1]
 
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
@@ -247,11 +260,19 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         loss: scalar.
     """
     w = initial_w
+    loss = calculate_loss(y, tx, w)
+    losses = [loss]
 
     for iter in range(max_iters):
         gradient = calculate_gradient(y, tx, w) + 2 * lambda_ * w
         w = w - gamma * gradient
+        loss = calculate_loss(y, tx, w)
+        
+        losses.append(loss)
+        
+        # converge criterion
+        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            break
+        
 
-    loss = calculate_loss(y, tx, w)
-
-    return w, loss
+    return w, loss[-1]
