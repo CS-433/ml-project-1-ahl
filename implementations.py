@@ -7,13 +7,12 @@ import numpy as np
 # ## HELPERS FUNCTIONS
 # ##############################################################
 
-
 def compute_gradient(y, tx, w):
     """Computes the gradient at w.
 
     Args:
         y: shape=(N, )
-        tx: shape=(N,2)
+        tx: shape=(N,D)
         w: shape=(2, ). The vector of model parameters.
 
     Returns:
@@ -25,7 +24,7 @@ def compute_gradient(y, tx, w):
 
 
 def calculate_mse(y, tx, w):
-    """Calculate the mse for vector e."""
+    """Calculate the mse."""
     e = y - tx @ w
     return (1 / 2) * np.mean(e**2)
 
@@ -94,23 +93,28 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         w:    optimal weights, numpy array of shape(D,), D is the number of features
         loss: the loss, a scalar
     """
+    threshold = 1e-8
     w = initial_w
     loss = calculate_mse(y, tx, w)
+    losses = [loss]
 
-    for n_iter in range(max_iters):
+    for iter in range(max_iters):
         # compute gradient
         grad = compute_gradient(y, tx, w)
         # update w by gradient descent
         w = w - (gamma * grad)
-        print(
-            "Gradient Descent({bi}/{ti}): loss={l}".format(
-                bi=n_iter, ti=max_iters - 1, l=loss
-            )
-        )
-        # compute loss and append it to array
         loss = calculate_mse(y, tx, w)
+        
+        if iter % 1 == 0:
+            print("Current iteration={i}, the loss={l}, the grad={we}".format(i=iter, l=loss, we=np.mean(grad)))
+            
+        losses.append(loss)
+        
+        # converge criterion
+        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            break
 
-    return w, loss
+    return w, losses[-1]
 
 
 def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
