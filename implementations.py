@@ -1,5 +1,3 @@
-# implementation of ML methods
-
 import numpy as np
 
 
@@ -123,7 +121,7 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
     Args:
         y:         numpy array of shape (N,), N is the number of samples.
         tx:        numpy array of shape (N,D), D is the number of features.
-        initial_w: shape=(2, ). The initial guess (or the initialization) for the model parameters
+        initial_w: shape=(D, ). The initial guess (or the initialization) for the model parameters
         max_iters: a scalar denoting the total number of iterations of SGD
         gamma:     a scalar denoting the stepsize
 
@@ -131,11 +129,13 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         w:    optimal weights, numpy array of shape(D,), D is the number of features
         loss: the loss, a scalar
     """
+    threshold = 1e-8
     w = initial_w
     data_size = len(y)
     loss = calculate_mse(y, tx, w)
+    losses = [loss]
 
-    for n_iter in range(max_iters):
+    for iter in range(max_iters):
         indice = np.random.choice(np.arange(data_size))
 
         random_y = np.array([y[indice]])
@@ -149,6 +149,15 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
 
         # compute loss
         loss = calculate_mse(random_y, random_tx, w)
+        
+        if iter % 1 == 0:
+            print("Current iteration={i}, the loss={l}, the grad={we}".format(i=iter, l=loss, we=np.mean(grad)))
+            
+        losses.append(loss)
+        
+        # converge criterion
+        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            break
 
     return w, loss
 
@@ -190,9 +199,6 @@ def ridge_regression(y, tx, lambda_):
     X = tx.T @ tx + 2 * N * lambda_ * idmx
 
     w = np.linalg.solve(X, tx.T @ y)
-
-    loss_x = tx.T @ tx
-    loss_w = np.linalg.solve(loss_x, tx.T @ y)
     loss = calculate_mse(y, tx, w)
 
     return w, loss
