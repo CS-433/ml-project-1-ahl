@@ -154,8 +154,11 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     """
     threshold = 1e-8
     w = initial_w
+    grad = calculate_gradient(y, tx, w)
     loss = calculate_loss(y, tx, w)
     losses = [loss]
+    
+    print("Preiteration, the loss={l}, the grad={we}".format(l=loss, we=np.mean(grad)))
 
     for iter in range(max_iters):
         grad = calculate_gradient(y, tx, w)
@@ -167,7 +170,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         if iter % 1 == 0:
             print(
                 "Current iteration={i}, the loss={l}, the grad={we}".format(
-                    i=iter, l=loss, we=np.mean(grad)
+                    i=iter, l=loss, we=np.linalg.norm(grad)
                 )
             )
 
