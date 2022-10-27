@@ -31,7 +31,7 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         if iter % 1 == 0:
             print(
                 "Current iteration={i}, the loss={l}, the grad={we}".format(
-                    i=iter, l=loss, we=np.mean(grad)
+                    i=iter, l=loss, we=np.linalg.norm(grad)
                 )
             )
 

@@ -3,9 +3,9 @@
 import numpy as np
 from implementations import *
 
-def ridge_regression_best_lambda(y, tx):
+def ridge_regression_best_lambda(y, tx, log1, log2, step):
     # array of lambdas 
-    lambdas = np.logspace(-4, 0, 30)
+    lambdas = np.linspace(log1, log2, step)
     losses = []
     
     for lambda_ in lambdas: 
