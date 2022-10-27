@@ -36,7 +36,7 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
 
-    return w, losses[iter]
+    return w, losses
 
 
 def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
@@ -83,7 +83,7 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
 
-    return w, loss[iter]
+    return w, loss
 
 
 def least_squares(y, tx):
@@ -164,7 +164,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
 
-    return w, loss[iter]
+    return w, loss
 
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
@@ -200,4 +200,4 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
             break
         
 
-    return w, loss[iter]
+    return w, loss
