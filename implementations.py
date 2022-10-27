@@ -1,6 +1,7 @@
 import numpy as np
 from helper_functions import *
 
+
 def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     """Linear regression using the Gradient Descent algorithm.
 
@@ -26,12 +27,16 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         # update w by gradient descent
         w = w - (gamma * grad)
         loss = calculate_mse(y, tx, w)
-        
+
         if iter % 1 == 0:
-            print("Current iteration={i}, the loss={l}, the grad={we}".format(i=iter, l=loss, we=np.mean(grad)))
-            
+            print(
+                "Current iteration={i}, the loss={l}, the grad={we}".format(
+                    i=iter, l=loss, we=np.mean(grad)
+                )
+            )
+
         losses.append(loss)
-        
+
         # converge criterion
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
@@ -73,12 +78,16 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
 
         # compute loss
         loss = calculate_mse(random_y, random_tx, w)
-        
+
         if iter % 1 == 0:
-            print("Current iteration={i}, the loss={l}, the grad={we}".format(i=iter, l=loss, we=np.mean(grad)))
-            
+            print(
+                "Current iteration={i}, the loss={l}, the grad={we}".format(
+                    i=iter, l=loss, we=np.mean(grad)
+                )
+            )
+
         losses.append(loss)
-        
+
         # converge criterion
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
@@ -150,16 +159,20 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 
     for iter in range(max_iters):
         grad = calculate_gradient(y, tx, w)
-        
+
         w = w - gamma * grad
-        
+
         loss = calculate_loss(y, tx, w)
-        
+
         if iter % 1 == 0:
-            print("Current iteration={i}, the loss={l}, the grad={we}".format(i=iter, l=loss, we=np.mean(grad)))
-            
+            print(
+                "Current iteration={i}, the loss={l}, the grad={we}".format(
+                    i=iter, l=loss, we=np.mean(grad)
+                )
+            )
+
         losses.append(loss)
-        
+
         # converge criterion
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
@@ -192,12 +205,11 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         gradient = calculate_gradient(y, tx, w) + 2 * lambda_ * w
         w = w - gamma * gradient
         loss = calculate_loss(y, tx, w)
-        
+
         losses.append(loss)
-        
+
         # converge criterion
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
-        
 
     return w, loss
