@@ -5,6 +5,7 @@ import numpy as np
 # ## HELPERS FUNCTIONS
 # ##############################################################
 
+
 def compute_gradient(y, tx, w):
     """Computes the gradient at w.
     Args:
@@ -63,18 +64,20 @@ def calculate_gradient(y, tx, w):
 
     return 1 / N * tx.T @ (sigmoid(v) - y)
 
+
 def predict(weights, dataset):
     """generates predictions given weights and a dataset"""
-    
+
     y_pred = dataset @ weights
-    y_pred[np.where(y_pred <= 1/2)] = 0
-    y_pred[np.where(y_pred > 1/2)] = 1
-    
+    y_pred[np.where(y_pred <= 1 / 2)] = 0
+    y_pred[np.where(y_pred > 1 / 2)] = 1
+
     return y_pred
+
 
 def predict_logistic(weights, dataset):
     """generates predictions with logistic regression given weights and a dataset"""
-    
+
     y_pred = sigmoid(dataset @ weights)
-    
+
     return y_pred
