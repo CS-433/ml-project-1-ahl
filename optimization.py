@@ -3,9 +3,9 @@
 import numpy as np
 from implementations import *
 
-def ridge_regression_best_lambda(y, tx):
+def best_lambda(y, tx, start, end, inter):
     # array of lambdas 
-    lambdas = np.logspace(-4, 0, 30)
+    lambdas = np.linspace(start, end, inter)
     losses = []
     
     for lambda_ in lambdas: 
@@ -43,6 +43,9 @@ def dataClean(tx):
     
     # we then standardize the dataset 
     standardize_dataset, _, _ = standardize(tx_optimized)
+    
+    # add column of 1 to our dataset
+    np.c_[np.ones((standardize_dataset.shape[0],1)), standardize_dataset]
     
     return standardize_dataset
     
