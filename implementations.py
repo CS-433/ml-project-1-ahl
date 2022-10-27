@@ -36,7 +36,7 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
 
-    return w, losses
+    return w, loss
 
 
 def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
