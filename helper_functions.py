@@ -88,5 +88,8 @@ def predict_logistic(weights, dataset):
     """generates predictions with logistic regression given weights and a dataset"""
     
     y_pred = sigmoid(dataset @ weights)
+    y_pred[np.where(y_pred <= 1/2)] = 0
+    y_pred[np.where(y_pred > 1/2)] = 1
+    y_pred[y_pred==0] = -1
     
     return y_pred
