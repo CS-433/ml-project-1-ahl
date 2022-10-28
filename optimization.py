@@ -5,7 +5,7 @@ from implementations import *
 
 def best_lambda(y, tx, start, end, inter):
     # array of lambdas 
-    lambdas = np.linspace(start, end, inter)
+    lambdas = np.logspace(start, end, inter)
     losses = []
     
     for lambda_ in lambdas: 
@@ -86,16 +86,16 @@ def dataClean(tx, y):
     tx_train, y_train = split_train(tx, y)
     
     for i in range(4): 
-        tx_train[i] = delete_useless_features(tx_train[i])
+        tx_train[i], indx = delete_useless_features(tx_train[i])
         tx_train[i] = replace_outliers(tx_train[i], r=2)
-        tx_train[i] = standardize(tx_train[i])
-        tx_train[i] = add_bias(tx_train[i])
+        #tx_train[i] = standardize(tx_train[i])
+        tx_train[i] = add_col_one(tx_train[i])
         
     return tx_train, y_train
 
 def dataClean_without_splitting(tx):
     tx, indx = delete_useless_features(tx)
-    tx = replace_outliers(tx, r=2)
+    tx = replace_outliers(tx, r=1.5)
     tx = standardize(tx)
     tx = add_col_one(tx)
         
