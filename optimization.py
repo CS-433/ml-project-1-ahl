@@ -49,7 +49,6 @@ def split_train(tx, y):
     
     return [tx_0, tx_1, tx_2, tx_3], [y_0, y_1, y_2, y_3] 
 
-
 def add_col_one(tx):
     # add column of 1 to our dataset
     return np.c_[np.ones((tx.shape[0],1)), tx]
@@ -99,4 +98,4 @@ def dataClean_without_splitting(tx):
     tx = standardize(tx)
     tx = add_col_one(tx)
         
-    return tx
+    return tx, deleted
