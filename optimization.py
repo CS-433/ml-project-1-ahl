@@ -62,19 +62,49 @@ def delete_useless_features(tx):
     
     return tx, indx
 
-def replace_outliers(tx, r):
+def miss_to_nan(tx):
+    return np.where(tx > -999, tx, np.nan)
+
+def replace_outliers(tx, r=2):
     tx_clean = np.copy(tx.T)
 
     for i in range(tx_clean.shape[0]):
         line = tx.T[i]
         med = np.median(line)
         std = np.std(line)
-        low = np.max([-999, med-r*std])
+        
+        low = med-r*std
         up = med+r*std
-        tx_clean[i] = np.where(np.logical_and(line > low, line < up), line, med)
+        
+        line = np.where(np.logical_and(line > low, line < up), line, np.nan)
+        tx_clean[i] = np.where(np.isnan(line), line, np.nanmedian(line))
 
     return tx_clean.T
 
+def outliers_to_nan(tx, r=2):
+    tx_clean = np.copy(tx.T)
+
+    for i in range(tx_clean.shape[0]):
+        line = tx.T[i]
+        med = np.nanmedian(line)
+        std = np.nanstd(line)
+        
+        low = med-r*std
+        up = med+r*std
+        
+        tx_clean[i] = np.where(np.logical_and(line > low, line < up), line, np.nan)
+
+    return tx_clean.T
+
+def nan_to_median(tx):
+    tx_clean = np.copy(tx.T)
+    
+    for i in range(tx_clean.shape[0]):
+        line = tx.T[i]        
+        tx_clean[i] = np.where(~np.isnan(line), line, np.nanmedian(line))
+
+    return tx_clean.T
+    
 
 #calculates the nb of corrected claissification
 def calculate_accuracy(true_pred, y_pred): 
@@ -93,9 +123,12 @@ def dataClean(tx, y):
     return tx_train, y_train
 
 def dataClean_without_splitting(tx):
-    tx, deleted = delete_useless_features(tx)
-    tx = replace_outliers(tx, r=2)
+    # tx, deleted = delete_useless_features(tx)
+    tx = miss_to_nan(tx)
+    # tx = replace_outliers(tx, r=2)
+    tx = outliers_to_nan(tx, r=2)
+    tx = nan_to_median(tx)
     tx = standardize(tx)
     tx = add_col_one(tx)
         
-    return tx, deleted
+    return tx #, deleted
