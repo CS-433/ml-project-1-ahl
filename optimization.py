@@ -29,10 +29,6 @@ def standardize(dataset):
     
     return standardize_dataset
 
-# in case we want to standardize the test set given the mean and std of train set 
-def standardize_test(dataset, mean, std): 
-    return (dataset - mean)/std
-
 def split_train(tx, y): 
     # we split our training set into 4 parts, each part contain the datas for each section of PRI_jet_num, column number 22 of the dataset
     # this is the unique feature that contains integer number as well 
@@ -52,21 +48,22 @@ def split_train(tx, y):
     y_3 = y[col == 3]
     
     return [tx_0, tx_1, tx_2, tx_3], [y_0, y_1, y_2, y_3] 
+
+
+def add_col_one(tx)
+    # add column of 1 to our dataset
+    return np.c_[np.ones((tx.shape[0],1)), tx]
         
 def delete_useless_features(tx):
     # we remove the columns where there is a majority of -999 (NaN) elements 
     # each of these columns has 177457 datas that are equal to -999
     median = np.median(tx, axis=0) 
-    indx = np.where(median == -999)
-    tx_optimized = np.delete(tx, indx[0], 1)
+    indx = np.where(median == -999)[0]
+    tx = np.delete(tx, indx, 1)
     
-    return tx_optimized
+    return tx, indx
 
-def add_bias(tx): 
-    # add column of 1 to our dataset
-    return np.c_[np.ones((tx.shape[0],1)), tx]
-
-def replace_outliers(tx):
+def replace_outliers(tx, r):
     tx_clean = np.copy(tx.T)
     r = 2.5
 
@@ -101,7 +98,7 @@ def dataClean_without_splitting(tx):
     tx = delete_useless_features(tx)
     tx = replace_outliers(tx)
     tx = standardize(tx)
-    tx = add_bias(tx)
+    tx = add_col_one(tx)
         
     return tx
     
