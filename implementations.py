@@ -208,11 +208,18 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         gradient = calculate_gradient(y, tx, w) + 2 * lambda_ * w
         w = w - gamma * gradient
         loss = calculate_loss(y, tx, w)
+        
+        if iter % 1 == 0:
+            print(
+                "Current iteration={i}, the loss={l}, the grad={we}".format(
+                    i=iter, l=loss, we=np.linalg.norm(gradient)
+                )
+            )
 
         losses.append(loss)
 
         # converge criterion
-        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
-            break
+        #if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+        #    break
 
     return w, loss
