@@ -27,19 +27,27 @@ def standardize(dataset):
     
     standardize_dataset = (dataset - mean)/std
     
-    return standardize_dataset, mean, std
+    return standardize_dataset
 
-# in case we want to standardize the test set given the mean and std of train set 
-def standardize_test(dataset, mean, std): 
-    return (dataset - mean)/std
-
-def dataClean(tx): 
-    tx, _ = delete_useless_features(tx)
-    tx = replace_outliers(tx, 2)
-    tx, _, _ = standardize(tx)
-    tx = add_col_one(tx)
+def split_train(tx, y): 
+    # we split our training set into 4 parts, each part contain the datas for each section of PRI_jet_num, column number 22 of the dataset
+    # this is the unique feature that contains integer number as well 
     
-    return tx
+    col = tx[:,22]
+    tx = np.delete(tx, 22, 1) 
+    
+    tx_0 = tx[col == 0]
+    tx_1 = tx[col == 1]
+    tx_2 = tx[col == 2]
+    tx_3 = tx[col == 3]
+    
+    #we also split the labels in the same way 
+    y_0 = y[col == 0]
+    y_1 = y[col == 1]
+    y_2 = y[col == 2]
+    y_3 = y[col == 3]
+    
+    return [tx_0, tx_1, tx_2, tx_3], [y_0, y_1, y_2, y_3] 
 
 def add_col_one(tx):
     # add column of 1 to our dataset
@@ -56,6 +64,7 @@ def delete_useless_features(tx):
 
 def replace_outliers(tx, r):
     tx_clean = np.copy(tx.T)
+    r = 2.5
 
     for i in range(tx_clean.shape[0]):
         line = tx.T[i]
@@ -66,9 +75,29 @@ def replace_outliers(tx, r):
         tx_clean[i] = np.where(np.logical_and(line > low, line < up), line, med)
 
     return tx_clean.T
+
+
+#calculates the nb of corrected claissification
+def calculate_accuracy(true_pred, y_pred): 
+    nb_true = np.sum(y_pred == true_pred)
+    return nb_true/len(true_pred)
+
+def dataClean(tx, y): 
+    tx_train, y_train = split_train(tx, y)
     
-    
-    
-    
+    for i in range(4): 
+        tx_train[i] = delete_useless_features(tx_train[i])
+        tx_train[i] = replace_outliers(tx_train[i])
+        tx_train[i] = standardize(tx_train[i])
+        tx_train[i] = add_bias(tx_train[i])
         
+    return tx_train, y_train
+
+def dataClean_without_splitting(tx):
+    tx, deleted = delete_useless_features(tx)
+    tx = replace_outliers(tx, 2)
+    tx = standardize(tx)
+    tx = add_col_one(tx)
+        
+    return tx, deleted
     
