@@ -39,9 +39,9 @@ def dataClean(tx):
     tx, _, _ = standardize(tx)
     tx = add_col_one(tx)
     
-    return tx_clean
+    return tx
 
-def add_col_one(tx)
+def add_col_one(tx):
     # add column of 1 to our dataset
     return np.c_[np.ones((tx.shape[0],1)), tx]
         
