@@ -34,27 +34,27 @@ def standardize_test(dataset, mean, std):
     return (dataset - mean)/std
 
 def dataClean(tx): 
-    tx_clean = delete_useless_features(tx)
-    tx_clean = replace_outliers(tx)
+    tx, _ = delete_useless_features(tx)
+    tx = replace_outliers(tx, 2)
+    tx, _, _ = standardize(tx)
+    tx = add_col_one(tx)
     
     return tx_clean
+
+def add_col_one(tx)
+    # add column of 1 to our dataset
+    return np.c_[np.ones((tx.shape[0],1)), tx]
         
 def delete_useless_features(tx):
     # we remove the columns where there is a majority of -999 (NaN) elements 
     # each of these columns has 177457 datas that are equal to -999
     median = np.median(tx, axis=0) 
-    indx = np.where(median == -999)
-    tx_optimized = np.delete(tx, indx[0], 1)
+    indx = np.where(median == -999)[0]
+    tx = np.delete(tx, indx, 1)
     
-    # we then standardize the dataset 
-    standardize_dataset, _, _ = standardize(tx_optimized)
-    
-    # add column of 1 to our dataset
-    np.c_[np.ones((standardize_dataset.shape[0],1)), standardize_dataset]
-    
-    return standardize_dataset
+    return tx, indx
 
-def replace_outliers(tx):
+def replace_outliers(tx, r):
     tx_clean = np.copy(tx.T)
 
     for i in range(tx_clean.shape[0]):
