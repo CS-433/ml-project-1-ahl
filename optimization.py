@@ -65,7 +65,6 @@ def delete_useless_features(tx):
 
 def replace_outliers(tx, r):
     tx_clean = np.copy(tx.T)
-    r = 2.5
 
     for i in range(tx_clean.shape[0]):
         line = tx.T[i]
@@ -88,17 +87,16 @@ def dataClean(tx, y):
     
     for i in range(4): 
         tx_train[i] = delete_useless_features(tx_train[i])
-        tx_train[i] = replace_outliers(tx_train[i])
+        tx_train[i] = replace_outliers(tx_train[i], r=2)
         tx_train[i] = standardize(tx_train[i])
         tx_train[i] = add_bias(tx_train[i])
         
     return tx_train, y_train
 
 def dataClean_without_splitting(tx):
-    tx = delete_useless_features(tx)
-    tx = replace_outliers(tx)
+    tx, indx = delete_useless_features(tx)
+    tx = replace_outliers(tx, r=2)
     tx = standardize(tx)
     tx = add_col_one(tx)
         
     return tx
-    
