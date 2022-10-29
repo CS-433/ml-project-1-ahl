@@ -49,15 +49,20 @@ def split_train(tx, y):
     
     return [tx_0, tx_1, tx_2, tx_3], [y_0, y_1, y_2, y_3] 
 
-def add_col_one(tx):
+def add_bias(tx):
     # add column of 1 to our dataset
     return np.c_[np.ones((tx.shape[0],1)), tx]
         
-def delete_useless_features(tx):
+def remove_useless_features(tx):
     # we remove the columns where there is a majority of -999 (NaN) elements 
     # each of these columns has 177457 datas that are equal to -999
-    median = np.median(tx, axis=0) 
-    indx = np.where(median == -999)[0]
+    
+    # median = np.median(tx, axis=0) 
+    # indx = np.where(median == -999)[0]
+    
+    std_ = np.std(tx, axis=0) 
+    indx = np.where(std_ == 0)[0]
+    
     tx = np.delete(tx, indx, 1)
     
     return tx, indx
@@ -92,7 +97,7 @@ def outliers_to_nan(tx, r=2):
         low = med-r*std
         up = med+r*std
         
-        tx_clean[i] = np.where(np.logical_and(line > low, line < up), line, np.nan)
+        tx_clean[i] = np.where(np.logical_and(line >= low, line <= up), line, np.nan)
 
     return tx_clean.T
 
@@ -104,31 +109,48 @@ def nan_to_median(tx):
         tx_clean[i] = np.where(~np.isnan(line), line, np.nanmedian(line))
 
     return tx_clean.T
-    
+
+def useless_features_to_one(tx):
+    all_std = np.std(tx, axis=0)
+    idx = [i for i, std in enumerate(all_std) if std==0]
+    tx[:, idx] = 1
+    return tx
 
 #calculates the nb of corrected claissification
 def calculate_accuracy(true_pred, y_pred): 
     nb_true = np.sum(y_pred == true_pred)
     return nb_true/len(true_pred)
 
-def dataClean(tx, y): 
+def dataClean(tx, y, r=1.5): 
     tx_train, y_train = split_train(tx, y)
     
     for i in range(4): 
-        tx_train[i], indx = delete_useless_features(tx_train[i])
-        tx_train[i] = replace_outliers(tx_train[i], r=2)
-        #tx_train[i] = standardize(tx_train[i])
-        tx_train[i] = add_col_one(tx_train[i])
-        
+        tx_train[i], _ = remove_useless_features(tx_train[i])
+        # tx_train[i] = useless_features_to_one(tx_train[i])
+        tx_train[i] = miss_to_nan(tx_train[i])
+        # tx_train[i] = replace_outliers(tx_train[i], r=1.5)
+        tx_train[i] = outliers_to_nan(tx_train[i], r=r)
+        tx_train[i] = nan_to_median(tx_train[i])
+        tx_train[i] = standardize(tx_train[i])
+        tx_train[i] = add_bias(tx_train[i])
+
+    print(tx_train[0].shape)
+    print(y_train[0].shape)
+    print(tx_train[1].shape)
+    print(y_train[1].shape)
+    print(tx_train[2].shape)
+    print(y_train[2].shape)
+    print(tx_train[3].shape)
+    print(y_train[3].shape)
     return tx_train, y_train
 
-def dataClean_without_splitting(tx):
+def dataClean_without_splitting(tx, r=1.5):
     # tx, deleted = delete_useless_features(tx)
     tx = miss_to_nan(tx)
     # tx = replace_outliers(tx, r=1.5)
-    tx = outliers_to_nan(tx, r=3)
+    tx = outliers_to_nan(tx, r=r)
     tx = nan_to_median(tx)
     tx = standardize(tx)
-    tx = add_col_one(tx)
+    tx = add_bias(tx)
         
     return tx #, deleted
