@@ -3,6 +3,67 @@
 import numpy as np
 from implementations import *
 
+def build_poly(x, degree):
+    """polynomial basis functions for input data x, for j=0 up to j=degree.
+    
+    Args:
+        x: numpy array of shape (N,), N is the number of samples.
+        degree: integer.
+        
+    Returns:
+        poly: numpy array of shape (N,d+1)
+    """
+    result = np.ones((x.shape[0], 1))
+    
+    for deg in range(1, degree+1):
+        result = np.c_[result,np.power(x,deg)]
+    
+    return result
+
+def build_k_indices (y, k_fold, seed):
+    """build k indices for k-fold."""
+    num_row = y.shape[0]
+    interval = int(num_row / k_fold)
+    np.random.seed(seed)
+    indices = np.random.permutation(num_row)
+    k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
+    return np.array(k_indices)
+
+def cross_validation (y,tx, k_indices, k, lambda_ ):
+    te_ind = k_indices[k]
+    tr_ind = k_indices[~(np.arange(k_indices.shape[0])==k)]
+    tr_ind = tr_ind.reshape(-1)
+    y_te   = y[te_ind]
+    y_tr   = y[tr_ind]
+    tx_te  = tx[te_ind]
+    tx_tr  = tx[tr_ind]
+    w, loss_tr = ridge_regression(y_tr, tx_tr, lambda_)
+    _, loss_te = ridge_regression(y_te,tx_te, lambda_)
+    return loss_tr, loss_te, w
+    
+def best_lambda_degree(y, tx,k_fold, lambdas, degrees,seed):
+    k_indices = build_k_indices(y, k_fold, seed)
+    best_lambdas = []
+    best_rmses   = []
+    #for each degree, save lambdas 
+    for degree in degrees : 
+        rmse_te = []
+        for lambda_ in lambdas : 
+            rmse_te_temp = []
+            for k in range(k_fold): 
+                _, loss_te,_ = cross_validation(y, tx, k_indices, k, lambda_)
+                rmse_te_temp.append(loss_te)
+            rmse_te.append(np.mean(rmse_te_temp))
+        
+        indice_lambda = np.argmin(rmse_te)
+        best_lambdas.append (lambdas[indice_lambda])
+        best_rmses.append(rmse_te[indice_lambda])
+    
+    indice_deg = np.argmin(best_rmses)
+    best_deg = degrees[indice_deg]
+    best_lambda = best_lambdas[indice_deg]
+    return best_lambda, best_deg
+
 def best_lambda(y, tx, start, end, inter):
     # array of lambdas 
     lambdas = np.logspace(start, end, inter)
@@ -24,6 +85,12 @@ def standardize(dataset):
     
     mean = np.mean(dataset, axis=0)
     std = np.std(dataset, axis=0)
+    
+    standardize_dataset = (dataset - mean)/std
+    
+    return standardize_dataset
+
+def standardize_test(dataset, mean, std):
     
     standardize_dataset = (dataset - mean)/std
     
@@ -132,3 +199,12 @@ def dataClean_without_splitting(tx):
     tx = add_col_one(tx)
         
     return tx #, deleted
+
+def dataClean_without_splitting_te(te, mean, std):
+    te = miss_to_nan(te)
+    te = outliers_to_nan(te, r=3)
+    te = nan_to_median(te)
+    te = standardize_test(te, mean, std)
+    te = add_col_one(te)
+        
+    return te
