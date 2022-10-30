@@ -28,7 +28,20 @@ def build_k_indices (y, k_fold, seed):
                  for k in range(k_fold)]
     return np.array(k_indices)
 
-def cross_validation (y,tx, k_indices, k, lambda_ ):
+def cross_validation(y, tx, k_indices, k, lambda_, degree):
+    """return the loss of ridge regression for a fold corresponding to k_indices
+    
+    Args:
+        y:          shape=(N,)
+        x:          shape=(N,)
+        k_indices:  2D array returned by build_k_indices()
+        k:          scalar, the k-th fold (N.B.: not to confused with k_fold which is the fold nums)
+        lambda_:    scalar, cf. ridge_regression()
+        degree:     scalar, cf. build_poly()
+
+    Returns:
+        train and test mean square errors
+    """
     te_ind = k_indices[k]
     tr_ind = k_indices[~(np.arange(k_indices.shape[0])==k)]
     tr_ind = tr_ind.reshape(-1)
@@ -36,11 +49,25 @@ def cross_validation (y,tx, k_indices, k, lambda_ ):
     y_tr   = y[tr_ind]
     tx_te  = tx[te_ind]
     tx_tr  = tx[tr_ind]
+    tx_tr = build_poly(tx_tr, degree)
+    tx_te = build_poly(tx_te, degree)
     w,loss_tr = ridge_regression(y_tr, tx_tr, lambda_)
     _,loss_te = ridge_regression(y_te,tx_te, lambda_)
+    
     return loss_tr, loss_te,w
 
-def best_lambda_degree(y, tx,k_fold, lambdas, degrees,seed):
+def best_lambda_degree(y, tx, k_fold, lambdas, degrees, seed):
+    """cross validation over regularisation parameter lambda and degree.
+    
+    Args:
+        degrees: shape = (d,), where d is the number of degrees to test 
+        k_fold: integer, the number of folds
+        lambdas: shape = (p, ) where p is the number of values of lambda to test
+    Returns:
+        best_degree : integer, value of the best degree
+        best_lambda : scalar, value of the best lambda
+        
+    """
     k_indices = build_k_indices(y, k_fold, seed)
     best_lambdas = []
     best_rmses   = []
@@ -50,7 +77,7 @@ def best_lambda_degree(y, tx,k_fold, lambdas, degrees,seed):
         for lambda_ in lambdas : 
             rmse_temp = []
             for k in range(k_fold): 
-                _, loss_te,_ = cross_validation (y, tx, k_indices, k, lambda_)
+                _, loss_te,_ = cross_validation(y, tx, k_indices, k, lambda_, degree)
                 rmse_temp.append(loss_te)
             rmse_te.append(np.mean(rmse_temp))
         
@@ -61,22 +88,20 @@ def best_lambda_degree(y, tx,k_fold, lambdas, degrees,seed):
     indice_deg = np.argmin(best_rmses)
     best_lambda = best_lambdas[indice_deg]
     best_degree = degrees[indice_deg]
+    
     return  best_lambda, best_degree
 
 
 def standardize(dataset):
-    
+    """normalizes the dataset by substracing it by its mean and dividing it its standard deviation."""
     mean = np.mean(dataset, axis=0)
     std = np.std(dataset, axis=0)
-    
     standardize_dataset = (dataset - mean)/std
-    
+
     return standardize_dataset
 
-def split_train(tx, y): 
-    # we split our training set into 4 parts, each part contain the datas for each section of PRI_jet_num, column number 22 of the dataset
-    # this is the unique feature that contains integer number as well 
-    
+def split_train(tx, y):
+    """splits the dataset into four parts according to the feature PRI_jet_num. (column number 22 of the features)."""
     col = tx[:,22]
     tx = np.delete(tx, 22, 1)
     
@@ -92,27 +117,24 @@ def split_train(tx, y):
     return txs, ys, ids 
 
 def add_bias(tx):
-    # add column of 1 to our dataset
+    """adds a vector of ones as a bias to our dataset."""
     return np.c_[np.ones((tx.shape[0],1)), tx]
         
 def remove_useless_features(tx):
-    # we remove the columns where there is a majority of -999 (NaN) elements 
-    # each of these columns has 177457 datas that are equal to -999
-    
-    # median = np.median(tx, axis=0) 
-    # indx = np.where(median == -999)[0]
+    """removes the features from the dataset where the standard deviation is 0."""
     
     std_ = np.std(tx, axis=0) 
     indx = np.where(std_ == 0)[0]
-    
     tx = np.delete(tx, indx, 1)
     
     return tx, indx
 
 def miss_to_nan(tx):
+    """transfroms the missing values (-999) to NaN values."""
     return np.where(tx > -999, tx, np.nan)
 
 def replace_outliers(tx, r):
+    """replaces the outliers by the median."""
     tx_clean = np.copy(tx.T)
 
     for i in range(tx_clean.shape[0]):
@@ -129,6 +151,7 @@ def replace_outliers(tx, r):
     return tx_clean.T
 
 def outliers_to_nan(tx, r):
+    """transfroms the outliers by NaN values."""
     tx_clean = np.copy(tx.T)
 
     for i in range(tx_clean.shape[0]):
@@ -144,6 +167,7 @@ def outliers_to_nan(tx, r):
     return tx_clean.T
 
 def nan_to_median(tx):
+    """replaces the NaN values by the median."""
     tx_clean = np.copy(tx.T)
     
     for i in range(tx_clean.shape[0]):
@@ -153,6 +177,7 @@ def nan_to_median(tx):
     return tx_clean.T
 
 def useless_features_to_one(tx):
+    """replaces the features with a zero standard deviation to one."""
     all_std = np.std(tx, axis=0)
     idx = [i for i, std in enumerate(all_std) if std==0]
     tx[:, idx] = 1
@@ -160,10 +185,12 @@ def useless_features_to_one(tx):
 
 #calculates the nb of corrected claissification
 def calculate_accuracy(true_pred, y_pred): 
+    """computes the accuracy based on the true prediction and the prediction computed by the resuts of our training model."""
     nb_true = np.sum(y_pred == true_pred)
     return nb_true/len(true_pred)
 
 def dataClean(tx, y, r=1.5): 
+    """splits the dataset into 4 parts, removes the outliers, replaces them by the median, normalizes the dataset and adds a bias."""
     tx_train, y_train, ids_train = split_train(tx, y)
     
     for i in range(4): 
@@ -177,6 +204,7 @@ def dataClean(tx, y, r=1.5):
     return tx_train, y_train, ids_train
 
 def dataClean_without_splitting(tx, r=1.5):
+    """removes the outliers, replaces them by the median, normalizes the dataset and adds a bias."""
     tx = miss_to_nan(tx)
     tx = outliers_to_nan(tx, r=r)
     tx = nan_to_median(tx)
