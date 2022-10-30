@@ -22,4 +22,4 @@ To run our code, download the data from [AIcrowd | EPFL Machine Learning Higgs |
 `finalsubmission.csv`: the predictions for the test data with our best model.
 
 ## Running the code : 
-You need to move to the root folder and execture ` python run.py`. 
+You need to move to the root folder and execute ` python run.py`. 
