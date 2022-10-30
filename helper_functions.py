@@ -48,11 +48,6 @@ def calculate_loss(y, tx, w):
     """
     N = y.shape[0]
     v = tx @ w
-    #print("############################## v= ",v)    
-    #sig = sigmoid(v)
-    #print("############################## sig= ",sig)
-    #log1 = np.log(sig)
-    #log2 = np.log(1-sig)
     
     return -np.sum(y * np.log(sigmoid(v)) + (1 - y) * np.log(1-sigmoid(v)))/N
 
