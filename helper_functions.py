@@ -5,9 +5,9 @@ def compute_gradient(y, tx, w):
     Args:
         y: shape=(N, )
         tx: shape=(N,D)
-        w: shape=(2, ). The vector of model parameters.
+        w: shape=(D, ). The vector of model parameters.
     Returns:
-        An array of shape (2, ) (same shape as w), containing the gradient of the loss at w.
+        An array of shape (D, ) (same shape as w), containing the gradient of the loss at w.
     """
     err = y - tx @ w
     grad = -(tx.T @ err) / len(err)
