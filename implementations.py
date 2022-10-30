@@ -79,7 +79,7 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         # compute loss
         loss = calculate_mse(random_y, random_tx, w)
 
-        if iter % 50 == 0:
+        if iter % 1 == 0:
             print(
                 "Current iteration={i}, the loss={l}, the grad={we}".format(
                     i=iter, l=loss, we=np.linalg.norm(grad)

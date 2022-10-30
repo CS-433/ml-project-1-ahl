@@ -131,7 +131,7 @@ def remove_useless_features(tx):
 def miss_to_nan(tx):
     return np.where(tx > -999, tx, np.nan)
 
-def replace_outliers(tx, r=3):
+def replace_outliers(tx, r):
     tx_clean = np.copy(tx.T)
 
     for i in range(tx_clean.shape[0]):
@@ -147,7 +147,7 @@ def replace_outliers(tx, r=3):
 
     return tx_clean.T
 
-def outliers_to_nan(tx, r=3):
+def outliers_to_nan(tx, r):
     tx_clean = np.copy(tx.T)
 
     for i in range(tx_clean.shape[0]):
@@ -182,7 +182,7 @@ def calculate_accuracy(true_pred, y_pred):
     nb_true = np.sum(y_pred == true_pred)
     return nb_true/len(true_pred)
 
-def dataClean(tx, y, r=3): 
+def dataClean(tx, y, r=1.5): 
     tx_train, y_train = split_train(tx, y)
     
     for i in range(4): 
