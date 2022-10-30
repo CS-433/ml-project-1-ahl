@@ -1,5 +1,3 @@
-# data analysis and parameter optimization functions 
-
 import numpy as np
 from implementations import *
 
@@ -65,22 +63,7 @@ def best_lambda_degree(y, tx,k_fold, lambdas, degrees,seed):
     best_degree = degrees[indice_deg]
     return  best_lambda, best_degree
 
-def best_lambda(y, tx, start, end, inter):
-    lambdas = np.logspace(start, end, inter)
-    losses = []
-    
-    for lambda_ in lambdas: 
-        
-        w, loss = ridge_regression(y, tx, lambda_) 
-        losses.append(loss)
-        print("Current lambda={i}, the loss={l}".format(i=lambda_, l=loss))
-        
-    ind_lambda = np.argmin(losses)
-    best_lambda = lambdas[ind_lambda]
-    
-    return best_lambda
 
-#return standardize dataset, its mean and its std
 def standardize(dataset):
     
     mean = np.mean(dataset, axis=0)
@@ -185,9 +168,7 @@ def dataClean(tx, y, r=1.5):
     
     for i in range(4): 
         tx_train[i], _ = remove_useless_features(tx_train[i])
-        # tx_train[i] = useless_features_to_one(tx_train[i])
         tx_train[i] = miss_to_nan(tx_train[i])
-        # tx_train[i] = replace_outliers(tx_train[i], r=1.5)
         tx_train[i] = outliers_to_nan(tx_train[i], r=r)
         tx_train[i] = nan_to_median(tx_train[i])
         tx_train[i] = standardize(tx_train[i])
@@ -196,12 +177,10 @@ def dataClean(tx, y, r=1.5):
     return tx_train, y_train, ids_train
 
 def dataClean_without_splitting(tx, r=1.5):
-    # tx, deleted = delete_useless_features(tx)
     tx = miss_to_nan(tx)
-    # tx = replace_outliers(tx, r=1.5)
     tx = outliers_to_nan(tx, r=r)
     tx = nan_to_median(tx)
     tx = standardize(tx)
     tx = add_bias(tx)
         
-    return tx #, deleted
+    return tx
