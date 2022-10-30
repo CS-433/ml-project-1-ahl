@@ -3,8 +3,69 @@
 import numpy as np
 from implementations import *
 
+def build_poly(x, degree):
+    """polynomial basis functions for input data x, for j=0 up to j=degree.
+    
+    Args:
+        x: numpy array of shape (N,), N is the number of samples.
+        degree: integer.
+        
+    Returns:
+        poly: numpy array of shape (N,d+1)
+    """
+    result = np.ones((x.shape[0], 1))
+    
+    for deg in range(1, degree+1):
+        result = np.c_[result,np.power(x,deg)]
+    
+    return result
+
+def build_k_indices (y, k_fold, seed):
+    """build k indices for k-fold."""
+    num_row = y.shape[0]
+    interval = int(num_row / k_fold)
+    np.random.seed(seed)
+    indices = np.random.permutation(num_row)
+    k_indices = [indices[k * interval: (k + 1) * interval]
+                 for k in range(k_fold)]
+    return np.array(k_indices)
+
+def cross_validation (y,tx, k_indices, k, lambda_ ):
+    te_ind = k_indices[k]
+    tr_ind = k_indices[~(np.arange(k_indices.shape[0])==k)]
+    tr_ind = tr_ind.reshape(-1)
+    y_te   = y[te_ind]
+    y_tr   = y[tr_ind]
+    tx_te  = tx[te_ind]
+    tx_tr  = tx[tr_ind]
+    w,loss_tr = ridge_regression(y_tr, tx_tr, lambda_)
+    _,loss_te = ridge_regression(y_te,tx_te, lambda_)
+    return loss_tr, loss_te,w
+
+def best_lambda_degree(y, tx,k_fold, lambdas, degrees,seed):
+    k_indices = build_k_indices(y, k_fold, seed)
+    best_lambdas = []
+    best_rmses   = []
+    
+    for degree in degrees : 
+        rmse_te = []
+        for lambda_ in lambdas : 
+            rmse_temp = []
+            for k in range(k_fold): 
+                _, loss_te,_ = cross_validation (y, tx, k_indices, k, lambda_)
+                rmse_temp.append(loss_te)
+            rmse_te.append(np.mean(rmse_temp))
+        
+        indice_lambda = np.argmin(rmse_te)
+        best_lambdas.append ( lambdas[indice_lambda])
+        best_rmses.append( rmse_te[indice_lambda])
+    
+    indice_deg = np.argmin(best_rmses)
+    best_lambda = best_lambdas[indice_deg]
+    best_degree = degrees[indice_deg]
+    return  best_lambda, best_degree
+
 def best_lambda(y, tx, start, end, inter):
-    # array of lambdas 
     lambdas = np.logspace(start, end, inter)
     losses = []
     
@@ -70,7 +131,7 @@ def remove_useless_features(tx):
 def miss_to_nan(tx):
     return np.where(tx > -999, tx, np.nan)
 
-def replace_outliers(tx, r=2):
+def replace_outliers(tx, r=3):
     tx_clean = np.copy(tx.T)
 
     for i in range(tx_clean.shape[0]):
@@ -86,7 +147,7 @@ def replace_outliers(tx, r=2):
 
     return tx_clean.T
 
-def outliers_to_nan(tx, r=2):
+def outliers_to_nan(tx, r=3):
     tx_clean = np.copy(tx.T)
 
     for i in range(tx_clean.shape[0]):
@@ -121,7 +182,7 @@ def calculate_accuracy(true_pred, y_pred):
     nb_true = np.sum(y_pred == true_pred)
     return nb_true/len(true_pred)
 
-def dataClean(tx, y, r=1.5): 
+def dataClean(tx, y, r=3): 
     tx_train, y_train = split_train(tx, y)
     
     for i in range(4): 
