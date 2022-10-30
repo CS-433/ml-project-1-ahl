@@ -95,20 +95,18 @@ def split_train(tx, y):
     # this is the unique feature that contains integer number as well 
     
     col = tx[:,22]
-    tx = np.delete(tx, 22, 1) 
+    tx = np.delete(tx, 22, 1)
     
-    tx_0 = tx[col == 0]
-    tx_1 = tx[col == 1]
-    tx_2 = tx[col == 2]
-    tx_3 = tx[col == 3]
+    txs = []
+    ys = []
+    ids = []
     
-    #we also split the labels in the same way 
-    y_0 = y[col == 0]
-    y_1 = y[col == 1]
-    y_2 = y[col == 2]
-    y_3 = y[col == 3]
+    for i in range(4):
+        ids.append(np.where(col == i))
+        txs.append(tx[ids[i]])
+        ys.append(y[ids[i]])
     
-    return [tx_0, tx_1, tx_2, tx_3], [y_0, y_1, y_2, y_3] 
+    return txs, ys, ids 
 
 def add_bias(tx):
     # add column of 1 to our dataset
@@ -183,7 +181,7 @@ def calculate_accuracy(true_pred, y_pred):
     return nb_true/len(true_pred)
 
 def dataClean(tx, y, r=1.5): 
-    tx_train, y_train = split_train(tx, y)
+    tx_train, y_train, ids_train = split_train(tx, y)
     
     for i in range(4): 
         tx_train[i], _ = remove_useless_features(tx_train[i])
@@ -195,15 +193,7 @@ def dataClean(tx, y, r=1.5):
         tx_train[i] = standardize(tx_train[i])
         tx_train[i] = add_bias(tx_train[i])
 
-    print(tx_train[0].shape)
-    print(y_train[0].shape)
-    print(tx_train[1].shape)
-    print(y_train[1].shape)
-    print(tx_train[2].shape)
-    print(y_train[2].shape)
-    print(tx_train[3].shape)
-    print(y_train[3].shape)
-    return tx_train, y_train
+    return tx_train, y_train, ids_train
 
 def dataClean_without_splitting(tx, r=1.5):
     # tx, deleted = delete_useless_features(tx)

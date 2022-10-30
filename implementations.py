@@ -20,6 +20,7 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     w = initial_w
     loss = calculate_mse(y, tx, w)
     losses = [loss]
+    grad = 0
 
     for iter in range(max_iters):
         # compute gradient
@@ -28,19 +29,18 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         w = w - (gamma * grad)
         loss = calculate_mse(y, tx, w)
 
-        if iter % 1 == 0:
-            print(
-                "Current iteration={i}, the loss={l}, the grad={we}".format(
-                    i=iter, l=loss, we=np.linalg.norm(grad)
-                )
-            )
+        if iter % 25 == 0:
+            print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(grad):.7f}')
+        else:
+            print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(grad):.7f}', end='\r')
 
         losses.append(loss)
 
         # converge criterion
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(grad):.7f}')
             break
-
+    
     return w, loss
 
 
@@ -62,6 +62,7 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
     w = initial_w
     data_size = len(y)
     loss = calculate_mse(y, tx, w)
+    grad = 0
     losses = [loss]
 
     for iter in range(max_iters):
@@ -79,19 +80,18 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         # compute loss
         loss = calculate_mse(random_y, random_tx, w)
 
-        if iter % 1 == 0:
-            print(
-                "Current iteration={i}, the loss={l}, the grad={we}".format(
-                    i=iter, l=loss, we=np.linalg.norm(grad)
-                )
-            )
+        if iter % 25 == 0:
+            print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(grad):.7f}')
+        else:
+            print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(grad):.7f}', end='\r')
 
         losses.append(loss)
 
         # converge criterion
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            print(f'the loss={loss:.7f}\t the grad={np.linalg.norm(grad):.7f}')
             break
-
+    
     return w, loss
 
 
@@ -167,17 +167,16 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
 
         loss = calculate_loss(y, tx, w)
 
-        if iter % 1 == 0:
-            print(
-                "Current iteration={i}, the loss={l}, the grad={we}".format(
-                    i=iter, l=loss, we=np.linalg.norm(grad)
-                )
-            )
+        if iter % 25 == 0:
+            print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(grad):.7f}')
+        else:
+            print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(grad):.7f}', end='\r')
 
         losses.append(loss)
 
         # converge criterion
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(grad):.7f}')
             break
 
     return w, loss
@@ -209,17 +208,16 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         w = w - gamma * gradient
         loss = calculate_loss(y, tx, w)
         
-        if iter % 1 == 0:
-            print(
-                "Current iteration={i}, the loss={l}, the grad={we}".format(
-                    i=iter, l=loss, we=np.linalg.norm(gradient)
-                )
-            )
+        if iter % 25 == 0:
+            print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(gradient):.7f}')
+        else:
+            print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(gradient):.7f}', end='\r')
 
         losses.append(loss)
 
         # converge criterion
         #if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+        #     print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(grad):.7f}')
         #    break
 
     return w, loss
