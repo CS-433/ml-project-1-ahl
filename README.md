@@ -10,7 +10,7 @@ This repository contains the code for the project1 of the Machine Learning Cours
 
 # Project structure
 ## Datas : 
-To run our code, download the data from [AIcrowd | EPFL Machine Learning Higgs | Challenges](https://www.aicrowd.com/challenges/epfl-machine-learning-higgs)  and put it at the root of our project. Otherwise, the user can simply change the data paths in `run.py` file to their own paths. 
+To run our code, download the data from https://www.aicrowd.com/challenges/epfl-machine-learning-higgs  and put it at the root of our project. Otherwise, the user can simply change the data paths in `run.py` file to their own paths. 
 ## Files : 
 - `optimization.py` : process data for model by spliting the classes into four groups, replace the -999 values by the NaN value, remove the outliers, and standardize our dataset. 
 - `helpers.py`: the provided helper functions to load the datas and create a submission file.

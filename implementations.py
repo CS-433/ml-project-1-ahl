@@ -216,8 +216,8 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         losses.append(loss)
 
         # converge criterion
-        #if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
-        #     print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(grad):.7f}')
-        #    break
+        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            print(f'Current iteration={iter}\t the loss={loss:.7f}\t the grad={np.linalg.norm(grad):.7f}')
+            break
 
     return w, loss

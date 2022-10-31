@@ -74,5 +74,5 @@ for i in range(4):
     y_pred_te[idsOpti_te[i]] = predicted
     
 # Submission 
-OUTPUT_PATH = 'final-submission'
+OUTPUT_PATH = 'finalsubmission'
 create_csv_submission(idsOpti_te, predicted, OUTPUT_PATH)

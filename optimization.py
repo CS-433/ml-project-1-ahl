@@ -186,7 +186,7 @@ def calculate_accuracy(true_pred, y_pred):
     nb_true = np.sum(y_pred == true_pred)
     return nb_true/len(true_pred)
 
-def dataClean(tx, y, r=1.5): 
+def dataClean(tx, y, r=4): 
     """splits the dataset into 4 parts, removes the outliers, replaces them by the median, normalizes the dataset and adds a bias."""
     tx_train, y_train, ids_train = split_train(tx, y)
     
