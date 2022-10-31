@@ -200,7 +200,7 @@ def dataClean(tx, y, r=1.5):
 
     return tx_train, y_train, ids_train
 
-def dataClean_without_splitting(tx, r=1.5):
+def dataClean_without_splitting(tx, r=4):
     """removes the outliers, replaces them by the median, normalizes the dataset and adds a bias."""
     tx = miss_to_nan(tx)
     tx = outliers_to_nan(tx, r=r)
