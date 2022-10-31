@@ -12,7 +12,7 @@ print("training dataset loaded")
 
 # Data cleaning 
 print("preprocessing the data")
-txOpti, yOpti, _ = dataClean(tx_tr, y_tr)
+txOpti, yOpti, idsOpti = dataClean(tx_tr, y_tr)
 print("preprocessing done")
 
 # Training with our best model: ridge regression 
