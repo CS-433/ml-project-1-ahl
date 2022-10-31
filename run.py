@@ -23,7 +23,6 @@ txPoly = []
 for i in range(4): 
     print(f"shape of txOpti[{i}] ", txOpti[i].shape)
     yOpti[i][np.where(yOpti == -1)] = 0
-    initial_w = np.zeros(txOpti[i].shape[1])
     lambda_, degree = best_lambda_degree(yOpti[i], txOpti[i], 4, np.logspace(-6, 0, 30), np.arange(2,5), 1)
     t = build_poly(txOpti[i], degree)
     w, loss = ridge_regression(yOpti[i], t, lambda_)

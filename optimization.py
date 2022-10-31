@@ -1,5 +1,6 @@
 import numpy as np
 from implementations import *
+from helper_functions import *
 
 def build_poly(x, degree):
     """polynomial basis functions for input data x, for j=0 up to j=degree.
@@ -38,7 +39,6 @@ def cross_validation(y, tx, k_indices, k, lambda_, degree):
         k:          scalar, the k-th fold (N.B.: not to confused with k_fold which is the fold nums)
         lambda_:    scalar, cf. ridge_regression()
         degree:     scalar, cf. build_poly()
-
     Returns:
         train and test mean square errors
     """
@@ -77,7 +77,7 @@ def best_lambda_degree(y, tx, k_fold, lambdas, degrees, seed):
         for lambda_ in lambdas : 
             rmse_temp = []
             for k in range(k_fold): 
-                _, loss_te,_ = cross_validation(y, tx, k_indices, k, lambda_, degree)
+                _, loss_te, _ = cross_validation(y, tx, k_indices, k, lambda_, degree)
                 rmse_temp.append(loss_te)
             rmse_te.append(np.mean(rmse_temp))
         
@@ -92,10 +92,8 @@ def best_lambda_degree(y, tx, k_fold, lambdas, degrees, seed):
     return  best_lambda, best_degree
 
 
-def standardize(dataset):
+def standardize(dataset, mean, std):
     """normalizes the dataset by substracing it by its mean and dividing it its standard deviation."""
-    mean = np.mean(dataset, axis=0)
-    std = np.std(dataset, axis=0)
     standardize_dataset = (dataset - mean)/std
 
     return standardize_dataset
@@ -183,13 +181,12 @@ def useless_features_to_one(tx):
     tx[:, idx] = 1
     return tx
 
-#calculates the nb of corrected claissification
 def calculate_accuracy(true_pred, y_pred): 
     """computes the accuracy based on the true prediction and the prediction computed by the resuts of our training model."""
     nb_true = np.sum(y_pred == true_pred)
     return nb_true/len(true_pred)
 
-def dataClean(tx, y, r=1.5): 
+def dataClean(tx, y, r=4): 
     """splits the dataset into 4 parts, removes the outliers, replaces them by the median, normalizes the dataset and adds a bias."""
     tx_train, y_train, ids_train = split_train(tx, y)
     
@@ -198,17 +195,18 @@ def dataClean(tx, y, r=1.5):
         tx_train[i] = miss_to_nan(tx_train[i])
         tx_train[i] = outliers_to_nan(tx_train[i], r=r)
         tx_train[i] = nan_to_median(tx_train[i])
-        tx_train[i] = standardize(tx_train[i])
+        tx_train[i] = standardize(tx_train[i], np.mean(tx_train[i], axis=0), np.std(tx_train[i], axis=0))
         tx_train[i] = add_bias(tx_train[i])
 
     return tx_train, y_train, ids_train
 
-def dataClean_without_splitting(tx, r=1.5):
+def dataClean_without_splitting(tx, r=4):
     """removes the outliers, replaces them by the median, normalizes the dataset and adds a bias."""
+    tx, _ = remove_useless_features(tx)
     tx = miss_to_nan(tx)
     tx = outliers_to_nan(tx, r=r)
     tx = nan_to_median(tx)
-    tx = standardize(tx)
+    tx = standardize(tx, np.mean(tx, axis=0), np.std(tx, axis=0))
     tx = add_bias(tx)
         
     return tx
