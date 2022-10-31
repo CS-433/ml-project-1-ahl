@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def compute_gradient(y, tx, w):
     """Computes the gradient at w.
     Args:
@@ -28,12 +29,12 @@ def sigmoid(t):
         scalar or numpy array
     """
     # modified fuction to avoid overflows
-    
+
     pos = np.where(t >= 0)
-    neg = np.where(t<0)
-    t[pos]=1/(1+np.exp(-t[pos]))
-    t[neg]=np.exp(t[neg])/(1+np.exp(t[neg]))
-    
+    neg = np.where(t < 0)
+    t[pos] = 1 / (1 + np.exp(-t[pos]))
+    t[neg] = np.exp(t[neg]) / (1 + np.exp(t[neg]))
+
     return t
 
 
@@ -48,8 +49,8 @@ def calculate_loss(y, tx, w):
     """
     N = y.shape[0]
     v = tx @ w
-    
-    return -np.sum(y * np.log(sigmoid(v)) + (1 - y) * np.log(1-sigmoid(v)))/N
+
+    return -np.sum(y * np.log(sigmoid(v)) + (1 - y) * np.log(1 - sigmoid(v))) / N
 
 
 def calculate_gradient(y, tx, w):
@@ -66,22 +67,24 @@ def calculate_gradient(y, tx, w):
 
     return 1 / N * tx.T @ (sigmoid(v) - y)
 
+
 def predict(weights, dataset):
     """generates predictions given weights and a dataset"""
-    
+
     y_pred = dataset @ weights
-    y_pred[np.where(y_pred <= 1/2)] = -1
-    y_pred[np.where(y_pred > 1/2)] = 1
-    y_pred[y_pred==0] = -1
-    
+    y_pred[np.where(y_pred <= 1 / 2)] = -1
+    y_pred[np.where(y_pred > 1 / 2)] = 1
+    y_pred[y_pred == 0] = -1
+
     return y_pred
+
 
 def predict_logistic(weights, dataset):
     """generates predictions with logistic regression given weights and a dataset"""
-    
+
     y_pred = sigmoid(dataset @ weights)
-    y_pred[np.where(y_pred <= 1/2)] = -1
-    y_pred[np.where(y_pred > 1/2)] = 1
-    y_pred[y_pred==0] = -1
-    
+    y_pred[np.where(y_pred <= 1 / 2)] = -1
+    y_pred[np.where(y_pred > 1 / 2)] = 1
+    y_pred[y_pred == 0] = -1
+
     return y_pred
